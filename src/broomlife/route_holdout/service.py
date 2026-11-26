@@ -3,7 +3,8 @@ from dataclasses import replace
 
 from ..brush_usage.service import known_labels
 from ..wear_isotonic.service import score
-from ..settings import METRIC_LABEL, TARGET
+from ..settings import METRIC_LABEL, MISS_RATE_LIMIT, REPLACEMENT_THRESHOLD, TARGET
+from .audit import group_miss_rates, gated_groups
 from .contracts import Assessment, Folds, Paired, ScoreCard
 from .evaluation import apply_calibration, calibrate, evaluate, percentile
 
@@ -74,6 +75,8 @@ def backcheck(signals, intake, bounds, model):
     grouped = defaultdict(list)
     for row in evidence:
         grouped[row.group].append(row)
+    # 按组核对越界刷盘的漏报率；提前换盘只留下的下限不算实测，要单独处理。
+    miss_rates = group_miss_rates(evidence)
     report = {
         "metric": METRIC_LABEL,
         "overall": overall,
@@ -93,6 +96,7 @@ def backcheck(signals, intake, bounds, model):
         ],
         "calibration_points": len(steps),
         "interval_radius": radius,
+        "miss_rates": miss_rates,
     }
     gate = (
         passed
@@ -100,7 +104,13 @@ def backcheck(signals, intake, bounds, model):
         and len(calibration) >= 16
         and overall["observed_support"] >= 16
     )
-    return Assessment(steps, radius, gate, report)
+    gated = gated_groups(miss_rates)
+    report["miss_rate_review"] = {
+        "limit": MISS_RATE_LIMIT,
+        "threshold": REPLACEMENT_THRESHOLD,
+        "gated_groups": list(gated),
+    }
+    return Assessment(steps, radius, gate, report, miss_rates, gated)
 
 
 def score_card(model, assessment, signal):

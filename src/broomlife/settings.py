@@ -31,3 +31,9 @@ FIELD_BOUNDS = {
     "compatible": (0, 1),
 }
 CRITICAL_FIELDS = frozenset(("compatible", "hours", "service_at"))
+REPLACEMENT_THRESHOLD = 9.5
+MISS_RATE_NUMERATOR = 1
+MISS_RATE_DENOMINATOR = 5
+MISS_RATE_LIMIT = MISS_RATE_NUMERATOR / MISS_RATE_DENOMINATOR
+# 门槛比较使用未舍入读数；只有明确高出这一容差才算过门槛。
+ROUNDING_EPSILON = 1e-9

@@ -33,10 +33,12 @@ def fit(signals: list[Signal], labels: dict[str, Outcome]) -> Fit:
             for signal in ordered
         ]
     else:
+        # 提前换盘只留下磨耗下限，不是完整实测值；下限不进训练，只在回放核对用。
         rows = [
             LearningRow(signal, labels[signal.record.case_id])
             for signal in ordered
             if signal.record.case_id in labels
+            and labels[signal.record.case_id].occurred
         ]
     grouped = defaultdict(list)
     for row in rows:

@@ -28,3 +28,7 @@
 | TRAP-44 | 稀疏或常量参考出现越界值时拦住自动分派 | `src/broomlife/road_mix/service.py` | `tests/test_road_mix.py::test_constant_distribution_detects_outside` |
 | TRAP-53 | 同批重排仍得到相同证据和决策 | `src/broomlife/fleet_ledger/service.py` | `tests/test_fleet_ledger.py::test_report_is_permutation_invariant` |
 | TRAP-54 | 单笔推理与合并调用的结果一致 | `src/broomlife/wear_isotonic/service.py` | `tests/test_wear_isotonic.py::test_score_is_batch_invariant` |
+| TRAP-55 | 提前换盘的下限过门槛按越界，不当实测漏算 | `src/broomlife/route_holdout/audit.py` | `tests/test_replacement_audit.py::test_early_swap_lower_bound_above_gate_counts_as_out_of_bounds` |
+| TRAP-56 | 未过门槛下限按最不利实测核对组漏报率 | `src/broomlife/route_holdout/audit.py` | `tests/test_replacement_audit.py::test_lower_bound_below_gate_cannot_be_written_off_as_measured` |
+| TRAP-57 | 超两成漏报或无确定越界证据的组转人工且不占工位 | `src/broomlife/road_mix/service.py`、`src/broomlife/spare_recheck/service.py` | `tests/test_replacement_audit.py::test_gated_cases_do_not_occupy_slots_while_others_still_lock` |
+| TRAP-58 | 舍入误差不改变是否达标或两成漏报结论 | `src/broomlife/replacement.py` | `tests/test_replacement_audit.py::test_borderline_miss_rate_cannot_cross_twenty_percent_by_rounding` |

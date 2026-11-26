@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from ..sweep_duty.contracts import Signal
 
@@ -27,6 +27,8 @@ class Assessment:
     radius: float | None
     test_passed: bool
     report: dict
+    miss_rates: dict[str, dict] = field(default_factory=dict)
+    gated_groups: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)

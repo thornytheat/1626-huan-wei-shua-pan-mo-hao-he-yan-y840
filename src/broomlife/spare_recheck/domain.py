@@ -1,6 +1,7 @@
 from math import ceil
 
-from ..settings import ACTION_LABEL, FIELD_BOUNDS
+from ..replacement import crossed
+from ..settings import ACTION_LABEL, FIELD_BOUNDS, REPLACEMENT_THRESHOLD
 from .contracts import Request
 
 
@@ -19,7 +20,10 @@ def project_request(card, gate, calendar_day=None) -> Request:
     compatible = values["compatible"]
     score = card.estimate if gate.allowed else card.prior
     blocked = compatible < 1 or service_at < 26
-    priority = max(0, score - 9.5) * (1 + grit / 35)
+    # 门槛比较用未舍入分值；舍入误差不足以让未达标单据挤进分派。
+    priority = (score - REPLACEMENT_THRESHOLD if crossed(score) else 0.0) * (
+        1 + grit / 35
+    )
     units = 1 + int(downforce > 150) + int(rpm > 175)
     status = "candidate"
     reason = "RULE_ELIGIBLE"

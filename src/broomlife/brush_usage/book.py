@@ -92,7 +92,8 @@ def outcome(row: dict) -> Outcome:
         raise ValueError("事件标签须为 0 或 1")
     if TARGET == "count" and int(value) != value:
         raise ValueError("计数目标须为整数")
-    if TARGET != "censored" and not occurred:
+    # 连续目标允许删失回执：提前换盘只留下磨耗下限，回放时按越界证据处理。
+    if TARGET not in {"continuous", "censored"} and not occurred:
         raise ValueError("该项目的观测结果不接受删失标志")
     return Outcome(case_id, available, value, occurred)
 
